@@ -1,25 +1,18 @@
-import { createAction, createReducer, configureStore } from '@reduxjs/toolkit';
+import { configureStore, createSlice } from '@reduxjs/toolkit';
 
-const addToDo = createAction("ADD");
-const deleteToDo = createAction("DELETE");
-
-//createReducer를 사용하면 state를 mutate 할 수 있음
-//state를 mutate 할 경우 return을 하면 안됨 
-//mutate 하지 않는 경우는 새로운 state를 return
-const reducer = createReducer([], {
-    [addToDo]: (state, action) => {
-        state.push({ text: action.payload, id: Date.now() })
-    },
-    [deleteToDo]: (state, action) => 
-        state.filter(toDo => toDo.id !== action.payload)
+//createSlice는 이전 모든 기능들을 압축하여 코드를 대폭 줄여줌
+//state, reducer, action이 전부 createSlice에 명시할 수 있음
+const toDos = createSlice({
+    name: "toDosReducer",
+    initialState: [],
+    reducers: {
+        add: (state, action) => {
+            state.push({ text: action.payload, id: Date.now() });
+        },
+        remove: (state, action) => state.filter(toDo => toDo.id !== action.payload)
+    }
 })
 
-//configureStore는 크롬에서 Redux DevTools를 사용할 수 있게 해줌
-const store = configureStore({reducer});
+export const { add, remove } = toDos.actions;
 
-export const actionCreators = {
-    addToDo,
-    deleteToDo
-}
-
-export default store;
+export default configureStore({ reducer:toDos.reducer });
